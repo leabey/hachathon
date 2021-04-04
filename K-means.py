@@ -1,0 +1,222 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Sat Apr  3 20:23:42 2021
+
+@author: lea
+
+Porgramme pour déterminer le nombre de classe et pour  réaliser le clustering 
+Ecriture des résultatsq dans un excel 
+"""
+
+import numpy as np 
+import pandas as pd 
+import matplotlib.pyplot as plt 
+from scipy.cluster.hierarchy import dendrogram, linkage, fcluster
+from sklearn.cluster import KMeans
+from sklearn import metrics, cluster
+from xlwt import Workbook
+import xlrd
+
+# ----- PREPARATION DE L'EXCEL FINAL
+classeur1 = Workbook() 
+feuille1 = classeur1.add_sheet("Feuil1",cell_overwrite_ok=True)
+
+classeur = Workbook() 
+feuille = classeur.add_sheet("Feuil1",cell_overwrite_ok=True)
+
+feuille.write( 0, 0, "Compteur")
+feuille.write( 0, 1, "Données brutes Classe K-means 4 ")
+feuille.write( 0, 2, "Données brutes Classe CAH 4")
+
+feuille.write( 0, 3, "Données brutes Classe K-means 5 ")
+feuille.write( 0, 4, "Données brutes Classe CAH 5")
+
+feuille.write( 0, 5, "Données écart Classe K-means 4 ")
+feuille.write( 0, 6, "Données écart Classe CAH 4")
+
+feuille.write( 0, 7, "Données écart Classe K-means 5 ")
+feuille.write( 0, 8, "Données écart Classe CAH 5")
+
+workbook_ecriture = xlrd.open_workbook("/Users/lea/Desktop/LISTE DES COMPTEURS_modiff.xls")
+SheetNameList = workbook_ecriture.sheet_names() 
+worksheet_ecriture = workbook_ecriture.sheet_by_name(SheetNameList[0])
+num_rows_e = worksheet_ecriture.nrows 
+num_cells_e = worksheet_ecriture.ncols 
+                        
+
+for i in range (1,num_rows_e): 
+    
+    compteur = str(worksheet_ecriture.cell_value(i, 0))
+    feuille.write(i, 0, str(compteur))
+
+# ----- FICHIER 1 :DONNEES DE LA MOYENNE ANNUELLE DE CONSOMMATION AU PAS DE 10 MIN
+
+data1 = pd.read_excel ("/Users/lea/Desktop/Hackhaton/recap.xls", index_col = 0)
+X1 = data1.iloc[:,1:-1].values
+
+#METHODE DU COUDE 
+wcss1=[]
+for i in range(5,9):
+    kmeans1 =KMeans(n_clusters=i, init ="k-means++", random_state=0)
+    kmeans1.fit(X1)
+    wcss1.append(kmeans1.inertia_)
+plt.plot(range(5,9),wcss1)
+plt.title("methode du coude pour trouver k données brutes")
+plt.xlabel("nombre de clusters")
+plt.ylabel("WCSS")
+plt.show()
+
+
+# #Attribution des classes 
+k_means1A = KMeans(n_clusters=4, init = 'k-means++', random_state=0)
+y_kmeans1A=k_means1A.fit_predict(X1)
+
+
+for i in range(len(y_kmeans1A)): 
+    feuille1.write(i+1, 1, int(y_kmeans1A[i]))
+    
+
+k_means1A = KMeans(n_clusters=7, init = 'k-means++', random_state=0)
+y_kmeans1A=k_means1A.fit_predict(X1)
+
+
+for i in range(len(y_kmeans1A)): 
+    feuille1.write(i+1, 3, int(y_kmeans1A[i]))
+    
+    
+# #DENDROGRAM
+Z1 = linkage(X1, 'ward')
+# # fig = plt.figure(figsize=(25, 10))
+# # dn = dendrogram(Z1)
+# # plt.title("Dendrogramme données brutes")
+
+# # #Classement 
+groupes_cah1 = fcluster(Z1,4,criterion='maxclust') 
+# #print(groupes_cah1)
+# ##index triés des groupes
+# idg1 = np.argsort(groupes_cah1)
+# ##affichage des observations et leurs groupes
+# #print(pd.DataFrame(data1.index[idg1],groupes_cah1[idg1]))
+
+for i in range(len(groupes_cah1)): 
+    feuille.write(i+1, 2, int(groupes_cah1[i]))
+
+
+groupes_cah1 = fcluster(Z1,5,criterion='maxclust') 
+for i in range(len(groupes_cah1)): 
+    feuille.write(i+1, 4, int(groupes_cah1[i]))
+    
+# #utilisation de la métrique "silhouette" #faire varier le nombre de clusters de 2 à 10 
+# # res1 = np.arange(10,dtype="double")
+# # for k in np.arange(10):
+# #     km1 = cluster.KMeans(n_clusters=k+2)
+# #     km1.fit(data1) 
+# #     res1[k] = metrics.silhouette_score(data1,km1.labels_)
+# # print(res1)
+
+# # #graphique
+# # plt.title("Silhouette brute") 
+# # plt.xlabel("Nombre de clusters") 
+# # plt.plot(np.arange(2,12,1),res1) 
+# # plt.show()
+
+
+
+# # # #k-means sur les données centrées et réduites
+
+# kmeans1b = cluster.KMeans(n_clusters=5) 
+# kmeans1b.fit(X1)
+# #index triés des groupes
+# idk1 = np.argsort(kmeans1b.labels_)
+# #affichage des observations et leurs groupes
+# print(pd.DataFrame(data1.index[idk1],kmeans1b.labels_[idk1]))
+
+
+# for i in range(len(groupes_cah1)): 
+#     feuille.write(i+1, 6,int(kmeans1b.labels_[i]))
+
+
+#---------------FICHIER 2 : ECART RELATIF PAS DE 10 MIN PAR RAPPORT A LA MOYENNE ANNUELLE TOTALE
+    
+data2 = pd.read_excel ("/Users/lea/Desktop/Hackhaton/Difference.xls", index_col = 0)
+X2 = data2.iloc[:,1:-1].values
+
+# #METHODE DU COUDE 
+wcss2=[]
+for i in range(5,9):
+    kmeans2 =KMeans(n_clusters=i, init ="k-means++", random_state=0)
+    kmeans2.fit(X2)
+    wcss2.append(kmeans2.inertia_)
+    
+plt.plot(range(5,9),wcss2)
+plt.title("methode du coude pour trouver k erreur relative")
+plt.xlabel("nombre de clusters")
+plt.ylabel("WCSS")
+plt.show()
+
+
+# #Attribution des classes 
+k_means2A = KMeans(n_clusters=7, init = 'k-means++', random_state=0)
+y_kmeans2A=k_means2A.fit_predict(X2)
+for i in range(len(y_kmeans2A)): 
+    feuille1.write(i+1, 5, int(y_kmeans2A[i]))
+    
+k_means2A = KMeans(n_clusters=5, init = 'k-means++', random_state=0)
+y_kmeans2A=k_means2A.fit_predict(X2)
+for i in range(len(y_kmeans2A)): 
+    feuille.write(i+1, 7, int(y_kmeans2A[i]))
+    
+# #DENDROGRAM
+Z2 = linkage(X2, 'ward')
+# fig = plt.figure(figsize=(25, 10))
+# dn = dendrogram(Z2)
+# plt.title("Dendrogramme données erreur ")
+
+
+
+# #Classement 
+groupes_cah2 = fcluster(Z2,4,criterion='maxclust') 
+#print(groupes_cah2)
+#index triés des groupes
+idg2 = np.argsort(groupes_cah2)
+#affichage des observations et leurs groupes
+#print(pd.DataFrame(data2.index[idg2],groupes_cah2[idg2]))
+for i in range(len(groupes_cah2)): 
+    feuille.write(i+1, 6, int(groupes_cah2[i]))
+    
+groupes_cah2 = fcluster(Z2,5,criterion='maxclust') 
+
+for i in range(len(groupes_cah2)): 
+    feuille.write(i+1, 8, int(groupes_cah2[i]))
+
+# #utilisation de la métrique "silhouette" #faire varier le nombre de clusters de 2 à 10 
+# res2 = np.arange(10,dtype="double")
+# for k in np.arange(10):
+#     km2 = cluster.KMeans(n_clusters=k+2)
+#     km2.fit(data2) 
+#     res2[k] = metrics.silhouette_score(data2,km2.labels_)
+# print(res2)
+# #graphique
+# plt.title("Silhouette") 
+# plt.xlabel("# of clusters") 
+# plt.plot(np.arange(2,12,1),res2) 
+# plt.show()
+
+
+# # # #k-means sur les données centrées et réduites
+
+# kmeans2b = cluster.KMeans(n_clusters=4) 
+# kmeans2b.fit(X2)
+# #index triés des groupes
+# idk2b = np.argsort(kmeans2b.labels_)
+# #affichage des observations et leurs groupes
+# print(pd.DataFrame(data2.index[idk2b],kmeans2b.labels_[idk2b]))
+
+
+# for i in range(len(groupes_cah2)): 
+#     feuille.write(i+1, 3,int(kmeans2b.labels_[i]))
+    
+classeur1.save("/Users/lea/Desktop/classement_comparaison1B.xls")                
+
+
