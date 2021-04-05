@@ -6,7 +6,7 @@ Created on Tue Mar 30 14:17:44 2021
 @author: lea
 
 
-Ce programme permet de traiter les odnnées 
+Ce programme permet de traiter les données 
 Nous avons décidé de créer pour chaque dossier, un excel
 1 feuille = 1 compteur 
 1 ligne = 1 date 
@@ -18,7 +18,7 @@ import xlrd
  
 from xlwt import Workbook, Formula
  
-chemin ="/Users/lea/Desktop/Hackhaton/données_conso_importants"
+chemin ="/Users/lea/Desktop/Hackhaton/données_conso_importants"
 for element in os.listdir(chemin):
    classeur = Workbook()
    if os.path.exists(chemin + "/"+element):
@@ -30,7 +30,7 @@ for element in os.listdir(chemin):
   #si fichier xlsx
                     if fichier == "P10 CULTURE.xlsx":
                         
-                        workbook = xlrd.open_workbook("/Users/lea/Desktop/Hackhaton/données_conso_importants/"+element + "/" + fichier)
+                        workbook = xlrd.open_workbook("/Users/lea/Desktop/Hackhaton/données_conso_importants/"+element + "/" + fichier)
                         SheetNameList = workbook.sheet_names() 
                         worksheet = workbook.sheet_by_name(SheetNameList[0])
                         num_rows = worksheet.nrows 
@@ -83,7 +83,7 @@ for element in os.listdir(chemin):
                                 
                                 
                     elif fichier == "30000112124579.xlsx":
-                        workbook = xlrd.open_workbook("/Users/lea/Desktop/Hackhaton/données_conso_importants/"+element + "/" + fichier)
+                        workbook = xlrd.open_workbook("/Users/lea/Desktop/Hackhaton/données_conso_importants/"+element + "/" + fichier)
                         SheetNameList = workbook.sheet_names() 
                         worksheet = workbook.sheet_by_name(SheetNameList[0])
                         num_rows = worksheet.nrows 
@@ -149,7 +149,7 @@ for element in os.listdir(chemin):
         
                         if fichier != ".DS_Store" : 
                             if fichier.endswith(".txt") or fichier.endswith(".TXT"):
-                                nn="/Users/lea/Desktop/Hackhaton/données_conso_importants/"+ element + "/"+fichier
+                                nn="/Users/lea/Desktop/Hackhaton/données_conso_importants/"+ element + "/"+fichier
                               
                                 f = open(nn,"r")
                                 t = f.readlines() 
@@ -216,7 +216,7 @@ for element in os.listdir(chemin):
                                                
 
                             elif fichier.endswith(".csv"): 
-                                f = open("/Users/lea/Desktop/Hackhaton/données_conso_importants/"+ element + "/"+fichier,"r")
+                                f = open("/Users/lea/Desktop/Hackhaton/données_conso_importants/"+ element + "/"+fichier,"r")
                                 t = f.readlines() 
                                 for k in range(len(t)): 
                                     date = t[k][:10]
