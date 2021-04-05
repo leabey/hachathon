@@ -6,7 +6,7 @@ Les fichiers rendus :
 - K_means.py : le code python pour la classification 
 - traitement_donnes.py : le code python pour la réalisation des excels 
 - K_meansC1 : la sous classification réalisée pour la classe 1
-- La branche "excels créés" contient les excels qui sonnt créés par le code traitement des données 
+- La branche "excels créés" contient les excels qui sont créés par le code traitement des données 
 - Le power point 
 - .txt : le lien de la vidéo youtube
 Lien Youtube
